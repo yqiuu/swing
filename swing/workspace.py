@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 
 
@@ -44,8 +46,8 @@ class Workspace:
         else:
             self._init_scheme = 'file'
             checkpoint = pickle.load(open(restart_file, 'rb'))
-            for key, val in memo.items():
-                setattr(self, key, checkpoint)
+            for key, val in checkpoint.items():
+                setattr(self, key, val)
             self._i_iter = self._memo['iter'][-1]
             self._ncall = self._memo['ncall'][-1]
         #
@@ -113,4 +115,4 @@ class Workspace:
        checkpoint = {}
        for key in self._restart_keys:
             checkpoint[key] = getattr(self, key)
-       pickle.dump(cp, open(fname, 'wb'))
+       pickle.dump(checkpoint, open(fname, 'wb'))
