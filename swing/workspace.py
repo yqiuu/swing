@@ -1,3 +1,5 @@
+from .logger import logger
+
 import pickle
 
 import numpy as np
@@ -109,6 +111,22 @@ class Workspace:
         self._init_scheme = 'restart'
 
         return info
+
+
+    def print_progress(self, ncol=0):
+        logger.info(f"niter={self._i_iter}")
+        logger.info(f"ncall={self._ncall}")
+        logger.info(f"cost={self.cost_global_best:.9f}")
+        if ncol > 0:
+            pos = self.pos_global_best
+            for i_dim in range(0, self._ndim, ncol):
+                msg = ""
+                for i_col in range(ncol):
+                    idx = i_dim + i_col
+                    if idx < self._ndim:
+                        msg += f"x{idx}={pos[idx]:7.5f} "
+                logger.info(msg)
+        logger.info("-"*60)
 
 
     def save_checkpoint(self, fname):
