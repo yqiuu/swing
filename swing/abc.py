@@ -1,7 +1,5 @@
 from .workspace import Workspace
 
-from copy import deepcopy
-
 import numpy as np
 
 
@@ -43,7 +41,7 @@ class ArtificialBeeColony(Workspace):
             new_pos_j = lower
         elif new_pos_j > upper:
             new_pos_j = upper
-        new_pos = deepcopy(pos[i_bee]) 
+        new_pos = np.copy(pos[i_bee]) 
         new_pos[j_dim] = new_pos_j
         return new_pos
 
