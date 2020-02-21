@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from swing import ArtificialBeeColony
+from swing import ArtificialBeeColony, ParticleSwarm
 
 
 def cost_funct(x):
@@ -44,5 +44,5 @@ def test_consistency(tmpdir):
         np.testing.assert_allclose(memo_0['cost'], memo_2['cost'])
 
     tmpfile = tmpdir.mkdir('tmp').join('checkpoint')
-    for op in ['ArtificialBeeColony']:
+    for op in ['ArtificialBeeColony', 'ParticleSwarm']:
         run(op, tmpfile)
