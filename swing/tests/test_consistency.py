@@ -3,46 +3,51 @@ import numpy as np
 from swing import ArtificialBeeColony, ParticleSwarm
 
 
-def cost_funct(x):
+def cost_func(x):
     x = np.asarray(x)
     return np.sum(x*x)
+
+
+def compare_memo(memo_a, memo_b):
+    np.testing.assert_array_equal(memo_a['iter'], memo_b['iter'])
+    np.testing.assert_array_equal(memo_a['ncall'], memo_b['ncall'])
+    np.testing.assert_allclose(memo_a['pos'], memo_b['pos'])
+    np.testing.assert_allclose(memo_a['cost'], memo_b['cost'])
 
 
 def test_consistency(tmpdir):
     def run(optimizer, tmpfile):
         bounds = [(-2.2, 4.7)]*5
-        #
+        lb, ub = np.asarray(bounds).T
+        # Run a fiducial model
         niter = 40
         rstate = np.random.RandomState(seed=20070831)
-        op_0 = ArtificialBeeColony(cost_funct, bounds, rstate=rstate)
+        op_0 = ArtificialBeeColony(cost_func, bounds, rstate=rstate)
         op_0.swarm(niter=niter)
-        memo_0 = dict(op_0.memo)
-        for pos, cost in zip(memo_0['pos'], memo_0['cost']):
-            assert np.isclose(cost, cost_funct(pos))
-        #
+        # Run each iteration manully
         rstate = np.random.RandomState(seed=20070831)
-        op_1 = ArtificialBeeColony(cost_funct, bounds, rstate=rstate)
+        op_1 = ArtificialBeeColony(cost_func, bounds, rstate=rstate)
         for i_iter in range(niter):
-            op_1.swarm(niter=1)
-        memo_1 = dict(op_1.memo)
-        np.testing.assert_array_equal(memo_0['iter'], memo_1['iter'])
-        np.testing.assert_array_equal(memo_0['ncall'], memo_1['ncall'])
-        np.testing.assert_allclose(memo_0['pos'], memo_1['pos'])
-        np.testing.assert_allclose(memo_0['cost'], memo_1['cost'])
-        #
+            info = op_1.swarm(niter=1)
+            for data in info.values():
+                for pos, cost in zip(data['pos'], data['cost']):
+                    # Test consistency
+                    assert(np.isclose(cost, cost_func(pos)))
+                    # Test if all points are within the bounds
+                    for p in pos:
+                        assert(np.all(p >= lb) & np.all(p <= ub))
+        compare_memo(op_0.memo, op_1.memo)
+        # Test a restart run
         niter_restart = 23
         rstate = np.random.RandomState(seed=20070831)
-        op_2 = ArtificialBeeColony(cost_funct, bounds, rstate=rstate)
+        op_2 = ArtificialBeeColony(cost_func, bounds, rstate=rstate)
         op_2.swarm(niter=niter-niter_restart)
         op_2.save_checkpoint(tmpfile)
-        op_2 = ArtificialBeeColony(cost_funct, bounds, restart_file=tmpfile)
+        op_2 = ArtificialBeeColony(cost_func, bounds, restart_file=tmpfile)
         op_2.swarm(niter=niter_restart)
-        memo_2 = dict(op_2.memo)
-        np.testing.assert_array_equal(memo_0['iter'], memo_2['iter'])
-        np.testing.assert_array_equal(memo_0['ncall'], memo_2['ncall'])
-        np.testing.assert_allclose(memo_0['pos'], memo_2['pos'])
-        np.testing.assert_allclose(memo_0['cost'], memo_2['cost'])
+        compare_memo(op_0.memo, op_2.memo)
 
+    # Run tests for all optimizer
     tmpfile = tmpdir.mkdir('tmp').join('checkpoint')
     for op in ['ArtificialBeeColony', 'ParticleSwarm']:
         run(op, tmpfile)
