@@ -90,11 +90,11 @@ class Workspace:
 
     
     def _phase_init(self):
-        pass
+        return {'init': {'pos': None, 'cost': None}}
 
 
     def _phase_main(self):
-        pass
+        return {'main': {'pos': None, 'cost': None}}
 
 
     def swarm(self, niter=100):

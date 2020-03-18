@@ -65,7 +65,9 @@ class ArtificialBeeColony(Workspace):
         self._pos = np.asarray([self._init_new_pos() for i_bee in range(self._nswarm)])
         self._cost = self._evaluate_multi(self._pos)
         self._trail = np.zeros(self._nswarm, dtype='i4')
-        return {'init': (np.copy(self._pos), np.copy(self._cost), np.copy(self._trail))}
+        return {'init':
+            {'pos': np.copy(self._pos), 'cost': np.copy(self._cost), 'trail': np.copy(self._trail)}
+        }
 
 
     def _phase_main(self):
@@ -82,11 +84,15 @@ class ArtificialBeeColony(Workspace):
         new_cost = self._evaluate_multi(new_pos)
         for _ in map(self._move, queue, new_pos, new_cost): pass
         self._update_global_best()
-        info['employer'] = (np.copy(self._pos), np.copy(self._cost), np.copy(self._trail))
+        info['employer'] = {
+            'pos': np.copy(self._pos), 'cost': np.copy(self._cost), 'trail': np.copy(self._trail)
+        }
         # Onlooker bees phase
         queue = self._dance_area()
         new_pos = list(map(self._search_new_pos, queue))
         new_cost = self._evaluate_multi(new_pos)
         for _ in map(self._move, queue, new_pos, new_cost): pass
-        info['onlooker'] = (np.copy(self._pos), np.copy(self._cost), np.copy(self._trail))
+        info['onlooker'] = {
+            'pos': np.copy(self._pos), 'cost': np.copy(self._cost), 'trail': np.copy(self._trail)
+        }
         return info

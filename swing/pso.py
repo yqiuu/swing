@@ -69,7 +69,9 @@ class ParticleSwarm(Workspace):
         self._cost = self._evaluate_multi(self._pos)
         self._pos_local_best = np.copy(self._pos)
         self._cost_local_best = np.copy(self._cost)
-        return {'init': (np.copy(self._vel), np.copy(self._pos), np.copy(self._cost))}
+        return {'init':
+            {'vel': np.copy(self._vel), 'pos': np.copy(self._pos), 'cost': np.copy(self._cost)}
+        }
 
 
     def _phase_main(self):
@@ -81,4 +83,6 @@ class ParticleSwarm(Workspace):
         self._pos = next_pos
         self._cost = next_cost
         self._update_local_best()
-        return {'main': (np.copy(self._vel), np.copy(self._pos), np.copy(self._cost))}
+        return {'main':
+            {'vel': np.copy(self._vel), 'pos': np.copy(self._pos), 'cost': np.copy(self._cost)}
+        }
