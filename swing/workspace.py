@@ -124,7 +124,7 @@ class Workspace:
                 for i_col in range(ncol):
                     idx = i_dim + i_col
                     if idx < self._ndim:
-                        msg += f"x{idx}={pos[idx]:7.5f} "
+                        msg += f"x{idx}={pos[idx]:7.5f}".ljust(17)
                 logger.info(msg)
         logger.info("-"*60)
 
