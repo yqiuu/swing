@@ -31,7 +31,8 @@ class ArtificialBeeColony(Workspace):
         Acceleration coefficient towards the glaobl minimum.
     """
     def __init__(self,
-        func, bounds, nswarm=16, rstate=None, pool=None, restart_file=None, limit=0, gbest_c=1.5
+        func, bounds, nswarm=16, rstate=None, pool=None, restart_file=None,
+        limit=0, gbest_c=1.5
     ):
         super().__init__(
             func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool,
@@ -56,8 +57,10 @@ class ArtificialBeeColony(Workspace):
                 break
         # Generate a new position
         pos_ij = pos[i_bee][j_dim]
-        new_pos_j = pos_ij + (2*rstate.rand() - 1)*(pos[k_bee][j_dim] - pos_ij) \
-            + self._gbest_c*rstate.rand()*(self._pos_global_best[j_dim] - pos_ij)
+        gbest_c = self._gbest_c*rstate.rand()
+        new_pos_j = pos_ij \
+            + (2*rstate.rand() - 1)*(pos[k_bee][j_dim] - pos_ij) \
+            + gbest_c*(self._pos_global_best[j_dim] - pos_ij)
         lower = self._lbounds[j_dim]
         upper = self._ubounds[j_dim]
         if new_pos_j < lower:
@@ -79,17 +82,25 @@ class ArtificialBeeColony(Workspace):
 
 
     def _dance_area(self):
-        fit = np.vectorize(lambda x: 1./(1. + x) if x > 0. else 1. + abs(x))(self._cost)
+        fit = np.vectorize(
+            lambda x: 1./(1. + x) if x > 0. else 1. + abs(x))(self._cost
+        )
         fit /= np.sum(fit)
         return self._rstate.choice(self._nswarm, self._nswarm, True, fit)
 
 
     def _phase_init(self):
-        self._pos = np.asarray([self._init_new_pos() for i_bee in range(self._nswarm)])
+        self._pos = np.asarray(
+            [self._init_new_pos() for i_bee in range(self._nswarm)]
+        )
         self._cost = self._evaluate_multi(self._pos)
         self._trail = np.zeros(self._nswarm, dtype='i4')
-        return {'init':
-            {'pos': np.copy(self._pos), 'cost': np.copy(self._cost), 'trail': np.copy(self._trail)}
+        return {
+            'init':{
+                'pos': np.copy(self._pos),
+                'cost': np.copy(self._cost),
+                'trail': np.copy(self._trail)
+            }
         }
 
 
@@ -108,7 +119,9 @@ class ArtificialBeeColony(Workspace):
         for _ in map(self._move, queue, new_pos, new_cost): pass
         self._update_global_best()
         info['employer'] = {
-            'pos': np.copy(self._pos), 'cost': np.copy(self._cost), 'trail': np.copy(self._trail)
+            'pos': np.copy(self._pos),
+            'cost': np.copy(self._cost),
+            'trail': np.copy(self._trail)
         }
         # Onlooker bees phase
         queue = self._dance_area()
@@ -116,6 +129,8 @@ class ArtificialBeeColony(Workspace):
         new_cost = self._evaluate_multi(new_pos)
         for _ in map(self._move, queue, new_pos, new_cost): pass
         info['onlooker'] = {
-            'pos': np.copy(self._pos), 'cost': np.copy(self._cost), 'trail': np.copy(self._trail)
+            'pos': np.copy(self._pos),
+            'cost': np.copy(self._cost),
+            'trail': np.copy(self._trail)
         }
         return info
