@@ -31,7 +31,7 @@ class ArtificialBeeColony(Workspace):
         Acceleration coefficient towards the glaobl minimum.
     """
     def __init__(self,
-        func, bounds, nswarm=32, rstate=None, pool=None, restart_file=None, limit=0, gbest_c=1.5
+        func, bounds, nswarm=16, rstate=None, pool=None, restart_file=None, limit=0, gbest_c=1.5
     ):
         super().__init__(
             func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool,

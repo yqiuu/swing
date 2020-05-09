@@ -35,7 +35,7 @@ class ParticleSwarm(Workspace):
         Maximum velocity fraction with respect to the search ranges.
     """
     def __init__(self,
-        func, bounds, nswarm=32, rstate=None, pool=None, restart_file=None,
+        func, bounds, nswarm=16, rstate=None, pool=None, restart_file=None,
         weight=0.729, acc_lbest=1.49, acc_gbest=1.49, vel_max_frac=1.
     ):
         super().__init__(
