@@ -7,6 +7,29 @@ __all__ = ['ArtificialBeeColony']
 
 
 class ArtificialBeeColony(Workspace):
+    """
+    Artificial bee colony optimiser.
+
+    Parameters
+    ----------
+    func : callable
+        Cost function.
+    bounds : list
+        List of doublets (lower, upper) to specifiy the search ranges in each
+        dimension.
+    nswarm : int
+        Number of particles.
+    rstate : np.random.RandomState or None
+        Random number generator. If None, ``np.random`` is used.
+    pool : object
+        Parallel executor that supports the ``map`` method.
+    restart_file : str
+        Path to the restart file.
+    limit : int
+        Number of failed searhes to start the scout phase.
+    gbest_c : float
+        Acceleration coefficient towards the glaobl minimum.
+    """
     def __init__(self,
         func, bounds, nswarm=32, rstate=None, pool=None, restart_file=None, limit=0, gbest_c=1.5
     ):
@@ -20,7 +43,7 @@ class ArtificialBeeColony(Workspace):
             self._limit = limit
         self._gbest_c = gbest_c
 
-    
+
     def _search_new_pos(self, i_bee):
         rstate = self._rstate
         pos = self._pos
@@ -41,7 +64,7 @@ class ArtificialBeeColony(Workspace):
             new_pos_j = lower
         elif new_pos_j > upper:
             new_pos_j = upper
-        new_pos = np.copy(pos[i_bee]) 
+        new_pos = np.copy(pos[i_bee])
         new_pos[j_dim] = new_pos_j
         return new_pos
 

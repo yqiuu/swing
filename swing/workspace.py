@@ -11,22 +11,28 @@ __all__ = ['Workspace']
 class Workspace:
     @property
     def pos_global_best(self):
+        """Position of the global minimum"""
         return np.copy(self._pos_global_best)
 
 
     @property
     def cost_global_best(self):
+        """Value of the the global minimum"""
         return self._cost_global_best
 
 
     @property
     def memo(self):
+        """
+        Number of calls, position and value of the global minimum at
+        each iteration.
+        """
         return {key:np.array(val) for key, val in self._memo.items()}
 
 
     def __init__(self,
         func, bounds, nswarm, rstate, pool, restart_file, restart_keys
-    ):  
+    ):
         self._func = func
         self._lbounds, self._ubounds = np.array(bounds).T
         self._dbounds = self._ubounds - self._lbounds
@@ -67,7 +73,7 @@ class Workspace:
     def _evaluate(self, pos):
         self._ncall += 1
         return self._func(pos)
-        
+
 
     def _evaluate_multi(self, pos):
         self._ncall += len(pos)
@@ -84,11 +90,11 @@ class Workspace:
             self._pos_global_best = np.copy(self._pos[idx_min])
             self._cost_global_best = cost_min
 
-    
+
     def _init_new_pos(self):
         return self._lbounds + self._dbounds*self._rstate.rand(self._ndim)
 
-    
+
     def _phase_init(self):
         return {'init': {'pos': None, 'cost': None}}
 
@@ -98,6 +104,13 @@ class Workspace:
 
 
     def swarm(self, niter=100):
+        """Run the optimizer.
+
+        Parameters
+        ----------
+        niter : int
+            Number of iterations to run.
+        """
         if self._init_scheme == 'normal':
             info = self._phase_init()
             self._update_global_best()
@@ -114,6 +127,16 @@ class Workspace:
 
 
     def print_progress(self, ncol=0):
+        """Print progress.
+
+        Only work if the logging level is INFO.
+
+        Parameters
+        ----------
+        ncol : int, optional
+            Number of columns to print the position of the global minimum. If 0,
+            do not print the position.
+        """
         logger.info(f"niter={self._i_iter}")
         logger.info(f"ncall={self._ncall}")
         logger.info(f"cost={self.cost_global_best:.9f}")
@@ -130,7 +153,14 @@ class Workspace:
 
 
     def save_checkpoint(self, fname):
-       checkpoint = {}
-       for key in self._restart_keys:
+        """Save a checkpoint.
+
+        Parameters
+        ----------
+        fname : str
+            Path of the checkpoint.
+        """
+        checkpoint = {}
+        for key in self._restart_keys:
             checkpoint[key] = getattr(self, key)
-       pickle.dump(checkpoint, open(fname, 'wb'))
+        pickle.dump(checkpoint, open(fname, 'wb'))

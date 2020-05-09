@@ -7,6 +7,33 @@ __all__ = ['ParticleSwarm']
 
 
 class ParticleSwarm(Workspace):
+    """
+    Particle swarm optimiser.
+
+    Parameters
+    ----------
+    func : callable
+        Cost function.
+    bounds : list
+        List of doublets (lower, upper) to specifiy the search ranges in each
+        dimension.
+    nswarm : int
+        Number of particles.
+    rstate : np.random.RandomState or None
+        Random number generator. If None, ``np.random`` is used.
+    pool : object
+        Parallel executor that supports the ``map`` method.
+    restart_file : str
+        Path to the restart file.
+    weight : float,
+        Interial weight.
+    acc_lbest : float
+        Acceleration coefficient towards the local minimum.
+    acc_gbest : float
+        Acceleration coefficient towards the glaobl minimum.
+    vel_max_frac : float
+        Maximum velocity fraction with respect to the search ranges.
+    """
     def __init__(self,
         func, bounds, nswarm=32, rstate=None, pool=None, restart_file=None,
         weight=0.729, acc_lbest=1.49, acc_gbest=1.49, vel_max_frac=1.
@@ -41,7 +68,7 @@ class ParticleSwarm(Workspace):
         vel[cond] = -vel_max[cond]
         return vel
 
-    
+
     def _check_bounds(self, vel, pos):
         vel = np.copy(vel)
         pos = np.copy(pos)
