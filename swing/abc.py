@@ -119,8 +119,8 @@ class ArtificialBeeColony(Workspace):
         for _ in map(self._move, queue, new_pos, new_cost): pass
         self._update_global_best()
         info['employer'] = {
-            'pos': np.copy(self._pos),
-            'cost': np.copy(self._cost),
+            'pos': np.copy(new_pos),
+            'cost': np.copy(new_cost),
             'trail': np.copy(self._trail)
         }
         # Onlooker bees phase
@@ -129,8 +129,8 @@ class ArtificialBeeColony(Workspace):
         new_cost = self._evaluate_multi(new_pos)
         for _ in map(self._move, queue, new_pos, new_cost): pass
         info['onlooker'] = {
-            'pos': np.copy(self._pos),
-            'cost': np.copy(self._cost),
+            'pos': np.copy(new_pos),
+            'cost': np.copy(new_cost),
             'trail': np.copy(self._trail)
         }
         return info
