@@ -16,17 +16,17 @@ def compare_memo(memo_a, memo_b):
 
 
 def test_consistency(tmpdir):
-    def run(optimizer, tmpfile):
+    def run(minimizer, tmpfile):
         bounds = [(-2.2, 4.7)]*5
         lb, ub = np.asarray(bounds).T
         # Run a fiducial model
         niter = 40
         rstate = np.random.RandomState(seed=20070831)
-        op_0 = ArtificialBeeColony(cost_func, bounds, rstate=rstate)
+        op_0 = minimizer(cost_func, bounds, rstate=rstate)
         op_0.swarm(niter=niter)
         # Run each iteration manully
         rstate = np.random.RandomState(seed=20070831)
-        op_1 = ArtificialBeeColony(cost_func, bounds, rstate=rstate)
+        op_1 = minimizer(cost_func, bounds, rstate=rstate)
         for i_iter in range(niter):
             info = op_1.swarm(niter=1)
             for data in info.values():
@@ -40,14 +40,14 @@ def test_consistency(tmpdir):
         # Test a restart run
         niter_restart = 23
         rstate = np.random.RandomState(seed=20070831)
-        op_2 = ArtificialBeeColony(cost_func, bounds, rstate=rstate)
+        op_2 = minimizer(cost_func, bounds, rstate=rstate)
         op_2.swarm(niter=niter-niter_restart)
         op_2.save_checkpoint(tmpfile)
-        op_2 = ArtificialBeeColony(cost_func, bounds, restart_file=tmpfile)
+        op_2 = minimizer(cost_func, bounds, restart_file=tmpfile)
         op_2.swarm(niter=niter_restart)
         compare_memo(op_0.memo, op_2.memo)
 
     # Run tests for all optimizer
     tmpfile = tmpdir.mkdir('tmp').join('checkpoint')
-    for op in ['ArtificialBeeColony', 'ParticleSwarm']:
-        run(op, tmpfile)
+    for target in [ArtificialBeeColony, ParticleSwarm]:
+        run(target, tmpfile)
