@@ -8,9 +8,13 @@ python:
 before_install:
   - pip install --upgrade pip
 
-install:
+install: 
+  - pip install codecov
   - pip install -r requirements.txt
   - pip install .
-
+ 
 script:
   - pytest
+  
+after_success:
+  - codecov
