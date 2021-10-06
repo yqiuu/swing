@@ -75,12 +75,10 @@ class Workspace:
             pbar.set_description(msg)
             pbar.update()
 
-        total = niter
-        if self._init_scheme == 'normal':
-            total += 1
-
-        with tqdm(total=total, disable=(not progress_bar)) as pbar:
+        with tqdm(total=niter, disable=(not progress_bar)) as pbar:
             if self._init_scheme == 'normal':
+                self._i_iter += 1
+                niter -= 1
                 info = self._phase_init()
                 self._update_global_best()
                 self._update_memo()
