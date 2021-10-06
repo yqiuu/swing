@@ -1,8 +1,7 @@
-from .logger import logger
-
 import pickle
 
 import numpy as np
+from tqdm import tqdm
 
 
 __all__ = ['Workspace']
@@ -63,7 +62,7 @@ class Workspace:
             + ['_rstate', '_pos_global_best', '_cost_global_best', '_memo']
 
 
-    def swarm(self, niter=100):
+    def swarm(self, niter=100, progress_bar=True):
         """Run the optimizer.
 
         Parameters
@@ -71,45 +70,32 @@ class Workspace:
         niter : int
             Number of iterations to run.
         """
-        if self._init_scheme == 'normal':
-            info = self._phase_init()
-            self._update_global_best()
-            self._update_memo()
+        def update_progress_bar(pbar):
+            msg = "global minimum: {:.3e}".format(self.cost_global_best)
+            pbar.set_description(msg)
+            pbar.update()
 
-        for i_iter in range(niter):
-            self._i_iter += 1
-            info = self._phase_main()
-            self._update_global_best()
-            self._update_memo()
+        total = niter
+        if self._init_scheme == 'normal':
+            total += 1
+
+        with tqdm(total=total, disable=(not progress_bar)) as pbar:
+            if self._init_scheme == 'normal':
+                info = self._phase_init()
+                self._update_global_best()
+                self._update_memo()
+                update_progress_bar(pbar)
+
+            for i_iter in range(niter):
+                self._i_iter += 1
+                info = self._phase_main()
+                self._update_global_best()
+                self._update_memo()
+                update_progress_bar(pbar)
+
         self._init_scheme = 'restart'
 
         return info
-
-
-    def print_progress(self, ncol=0):
-        """Print progress.
-
-        Only work if the logging level is INFO.
-
-        Parameters
-        ----------
-        ncol : int, optional
-            Number of columns to print the position of the global minimum. If 0,
-            do not print the position.
-        """
-        logger.info(f"niter={self._i_iter}")
-        logger.info(f"ncall={self._ncall}")
-        logger.info(f"cost={self.cost_global_best:.9f}")
-        if ncol > 0:
-            pos = self.pos_global_best
-            for i_dim in range(0, self._ndim, ncol):
-                msg = ""
-                for i_col in range(ncol):
-                    idx = i_dim + i_col
-                    if idx < self._ndim:
-                        msg += f"x{idx}={pos[idx]:7.5f}".ljust(17)
-                logger.info(msg)
-        logger.info("-"*60)
 
 
     def save_checkpoint(self, fname):
@@ -164,3 +150,4 @@ class Workspace:
 
     def _phase_main(self):
         return {'main': {'pos': None, 'cost': None}}
+
