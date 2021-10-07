@@ -30,7 +30,7 @@ class Workspace:
 
 
     def __init__(self,
-        func, bounds, nswarm, rstate, pool, restart_file, restart_keys
+        func, bounds, nswarm, rstate, pool, vectorize, restart_file, restart_keys
     ):
         self._func = func
         self._lbounds, self._ubounds = np.array(bounds).T
@@ -38,6 +38,7 @@ class Workspace:
         self._ndim = len(bounds)
         self._nswarm = nswarm
         self._rstate = np.random.RandomState() if rstate is None else rstate
+        self._vectorize = vectorize
         self._pool = pool
         #
         self._pos_global_best = np.full(self._ndim, np.nan)
@@ -124,7 +125,9 @@ class Workspace:
 
     def _evaluate_multi(self, pos):
         self._ncall += len(pos)
-        if self._pool is None:
+        if self._vectorize:
+            return self._func(pos)
+        elif self._pool is None:
             return np.asarray(list(map(self._func, pos)))
         else:
             return np.asarray(list(self._pool.map(self._func, pos)))

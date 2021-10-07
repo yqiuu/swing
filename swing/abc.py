@@ -23,6 +23,9 @@ class ArtificialBeeColony(Workspace):
         Random number generator. If None, ``np.random`` is used.
     pool : object
         Parallel executor that supports the ``map`` method.
+    vectorize : bool
+        If True, the target function can accept an array of variables and
+        ``pool`` will be ignored.
     restart_file : str
         Path to the restart file.
     limit : int
@@ -31,11 +34,11 @@ class ArtificialBeeColony(Workspace):
         Acceleration coefficient towards the glaobl minimum.
     """
     def __init__(self,
-        func, bounds, nswarm=16, rstate=None, pool=None, restart_file=None,
+        func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False, restart_file=None,
         limit=0, gbest_c=1.5
     ):
         super().__init__(
-            func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool,
+            func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool, vectorize=vectorize,
             restart_file=restart_file, restart_keys=['_pos', '_cost', '_trail']
         )
         if limit == 0:

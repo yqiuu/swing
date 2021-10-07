@@ -23,6 +23,9 @@ class ParticleSwarm(Workspace):
         Random number generator. If None, ``np.random`` is used.
     pool : object
         Parallel executor that supports the ``map`` method.
+    vectorize : bool
+        If True, the target function can accept an array of variables and
+        ``pool`` will be ignored.
     restart_file : str
         Path to the restart file.
     weight : float,
@@ -35,14 +38,14 @@ class ParticleSwarm(Workspace):
         Maximum velocity fraction with respect to the search ranges.
     """
     def __init__(self,
-        func, bounds, nswarm=16, rstate=None, pool=None, restart_file=None,
+        func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False, restart_file=None,
         weight=0.729, acc_lbest=1.49, acc_gbest=1.49, vel_max_frac=1.
     ):
         restart_keys = [
             '_vel', '_pos', '_cost', '_pos_local_best', '_cost_local_best'
         ]
         super().__init__(
-            func=func, bounds=bounds, nswarm = nswarm, rstate=rstate, pool=pool,
+            func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool, vectorize=vectorize,
             restart_file=restart_file, restart_keys=restart_keys
         )
         self._weight = weight
