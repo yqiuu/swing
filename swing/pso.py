@@ -39,7 +39,7 @@ class ParticleSwarm(Workspace):
     """
     def __init__(self,
         func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False, restart_file=None,
-        weight=0.729, acc_lbest=1.49, acc_gbest=1.49, vel_max_frac=1.
+        weight=0.729, acc_lbest=1.49, acc_gbest=1.49, vel_max_frac=1., initial_pos=None
     ):
         restart_keys = [
             '_vel', '_pos', '_cost', '_pos_local_best', '_cost_local_best'
@@ -52,6 +52,9 @@ class ParticleSwarm(Workspace):
         self._acc_lbest = acc_lbest
         self._acc_gbest = acc_gbest
         self._vel_max = vel_max_frac*self._dbounds
+        if initial_pos is not None:
+            initial_pos = initial_pos.copy()
+        self._initial_pos = initial_pos
 
 
     def _init_new_vel(self):
@@ -100,9 +103,12 @@ class ParticleSwarm(Workspace):
         self._vel = np.array(
             [self._init_new_vel() for i_swarm in range(self._nswarm)]
         )
-        self._pos = np.array(
-            [self._init_new_pos() for i_swarm in range(self._nswarm)]
-        )
+        if self._initial_pos is None:
+            self._pos = np.array(
+                [self._init_new_pos() for i_swarm in range(self._nswarm)]
+            )
+        else:
+            self._pos = self._initial_pos
         self._cost = self._evaluate_multi(self._pos)
         self._pos_local_best = np.copy(self._pos)
         self._cost_local_best = np.copy(self._cost)
