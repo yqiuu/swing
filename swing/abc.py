@@ -35,7 +35,7 @@ class ArtificialBeeColony(Workspace):
     """
     def __init__(self,
         func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False, restart_file=None,
-        limit=0, gbest_c=1.5
+        limit=0, gbest_c=1.5, initial_pos=None
     ):
         super().__init__(
             func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool, vectorize=vectorize,
@@ -46,6 +46,9 @@ class ArtificialBeeColony(Workspace):
         else:
             self._limit = limit
         self._gbest_c = gbest_c
+        if initial_pos is not None:
+            initial_pos = initial_pos.copy()
+        self._initial_pos = initial_pos
 
 
     def _search_new_pos(self, i_bee):
@@ -93,9 +96,12 @@ class ArtificialBeeColony(Workspace):
 
 
     def _phase_init(self):
-        self._pos = np.asarray(
-            [self._init_new_pos() for i_bee in range(self._nswarm)]
-        )
+        if self._initial_pos is None:
+            self._pos = np.asarray(
+                [self._init_new_pos() for i_bee in range(self._nswarm)]
+            )
+        else:
+            self._pos = self._initial_pos
         self._cost = self._evaluate_multi(self._pos)
         self._trail = np.zeros(self._nswarm, dtype='i4')
         return {
