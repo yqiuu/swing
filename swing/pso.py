@@ -57,6 +57,18 @@ class ParticleSwarm(Workspace):
         self._initial_pos = initial_pos
 
 
+    @property
+    def pos_local_best(self):
+        """Position of the local minima."""
+        return self._pos_local_best
+
+
+    @property
+    def cost_local_best(self):
+        """Value of the local minima."""
+        return self._cost_local_best
+
+
     def _init_new_vel(self):
         return np.zeros(self._ndim)
 
