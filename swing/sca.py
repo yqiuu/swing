@@ -1,4 +1,4 @@
-from .workspace import Workspace
+from .workspace import apply_reflecting_boundary, Workspace
 
 import numpy as np
 
@@ -56,7 +56,7 @@ class SineCosine(Workspace):
             + r1*np.cos(r2)*np.abs(r3*self._pos_global_best - self._pos[cond])
 
         #
-        next_pos = self._check_bounds(next_pos)
+        next_pos = apply_reflecting_boundary(next_pos, self._lbounds, self._ubounds)
         next_cost = self._evaluate_multi(next_pos)
         #
         self._pos = next_pos
