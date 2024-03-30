@@ -19,15 +19,6 @@ class SineCosine(Workspace):
         self._factor_a = factor_a
         self._niter_max = niter_max
         self._initial_pos = initial_pos
-
-    def _check_bounds(self, pos):
-        pos = np.copy(pos)
-        for p_i in pos:
-            cond = p_i < self._lbounds
-            p_i[cond] = 2*self._lbounds[cond] - p_i[cond]
-            cond = p_i > self._ubounds
-            p_i[cond] = 2*self._ubounds[cond] - p_i[cond]
-        return pos
         
     def _phase_init(self):
         if self._initial_pos is None:
