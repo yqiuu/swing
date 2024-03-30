@@ -5,17 +5,7 @@ from scipy.stats.qmc import LatinHypercube
 from tqdm import tqdm
 
 
-__all__ = ['apply_reflecting_boundary', 'Workspace']
-
-
-def apply_reflecting_boundary(pos, lbounds, ubounds):
-    pos = np.copy(pos)
-    for p_i in pos:
-        cond = p_i < lbounds
-        p_i[cond] = 2*lbounds[cond] - p_i[cond]
-        cond = p_i > ubounds
-        p_i[cond] = 2*ubounds[cond] - p_i[cond]
-    return pos
+__all__ = ['Workspace']
 
 
 class Workspace:
@@ -159,6 +149,16 @@ class Workspace:
         else:
             samps = self._lh_sampler.random(num)
         return self._lbounds + self._dbounds*samps
+
+
+    def _reflect_pos(self, pos):
+        pos = np.copy(pos)
+        for p_i in pos:
+            cond = p_i < self._lbounds
+            p_i[cond] = 2*self._lbounds[cond] - p_i[cond]
+            cond = p_i > self._ubounds
+            p_i[cond] = 2*self._ubounds[cond] - p_i[cond]
+        return pos
 
 
     def _phase_init(self):
