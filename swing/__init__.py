@@ -3,3 +3,4 @@ from .workspace import *
 from .abc import *
 from .pso import *
 from .sca import *
+from .gwo import *
