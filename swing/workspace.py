@@ -1,6 +1,7 @@
 import pickle
 
 import numpy as np
+from scipy.stats.qmc import LatinHypercube
 from tqdm import tqdm
 
 
@@ -38,6 +39,7 @@ class Workspace:
         self._ndim = len(bounds)
         self._nswarm = nswarm
         self._rstate = np.random.RandomState() if rstate is None else rstate
+        self._lh_sampler = LatinHypercube(self._ndim, seed=self._rstate)
         self._vectorize = vectorize
         self._pool = pool
         #
@@ -141,8 +143,12 @@ class Workspace:
             self._cost_global_best = cost_min
 
 
-    def _init_new_pos(self):
-        return self._lbounds + self._dbounds*self._rstate.rand(self._ndim)
+    def _init_new_pos(self, num=1):
+        if num == 1:
+            samps = self._rstate.rand(self._ndim)
+        else:
+            samps = self._lh_sampler.random(num)
+        return self._lbounds + self._dbounds*samps
 
 
     def _phase_init(self):

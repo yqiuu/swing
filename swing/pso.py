@@ -116,9 +116,7 @@ class ParticleSwarm(Workspace):
             [self._init_new_vel() for i_swarm in range(self._nswarm)]
         )
         if self._initial_pos is None:
-            self._pos = np.array(
-                [self._init_new_pos() for i_swarm in range(self._nswarm)]
-            )
+            self._pos = self._init_new_pos(self._nswarm)
         else:
             self._pos = self._initial_pos
         self._cost = self._evaluate_multi(self._pos)
