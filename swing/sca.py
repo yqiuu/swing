@@ -29,6 +29,7 @@ class SineCosine(Workspace):
 
     def _phase_main(self):
         r1 = self._factor_a*(1 - self._i_iter/self._niter_max)
+        r1 = max(0, r1)
 
         next_pos = np.zeros([self._nswarm, self._ndim])
         cond = self._rstate.rand(self._nswarm) < 0.5
