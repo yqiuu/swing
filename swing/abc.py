@@ -122,6 +122,7 @@ class ArtificialBeeColony(Workspace):
                 self._trail[i_bee] = 0
             else:
                 new_pos[i_bee] = self._search_new_pos(i_bee)
+        new_pos = np.asarray(new_pos)
         new_cost = self._evaluate_multi(new_pos)
         for _ in map(self._move, queue, new_pos, new_cost): pass
         self._update_global_best()
@@ -133,6 +134,7 @@ class ArtificialBeeColony(Workspace):
         # Onlooker bees phase
         queue = self._dance_area()
         new_pos = list(map(self._search_new_pos, queue))
+        new_pos = np.asarray(new_pos)
         new_cost = self._evaluate_multi(new_pos)
         for _ in map(self._move, queue, new_pos, new_cost): pass
         info['onlooker'] = {
