@@ -70,7 +70,7 @@ class ParticleSwarm(Workspace):
 
 
     def _init_new_vel(self):
-        return np.zeros(self._ndim)
+        return np.zeros([self._nswarm, self._ndim])
 
 
     def _next_vel(self, i_particle):
@@ -112,9 +112,7 @@ class ParticleSwarm(Workspace):
 
 
     def _phase_init(self):
-        self._vel = np.array(
-            [self._init_new_vel() for i_swarm in range(self._nswarm)]
-        )
+        self._vel = self._init_new_vel()
         if self._initial_pos is None:
             self._pos = self._init_new_pos(self._nswarm)
         else:
