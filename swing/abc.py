@@ -73,6 +73,8 @@ class ArtificialBeeColony(Workspace):
             new_pos_j = 2*lower - new_pos_j
         elif new_pos_j > upper:
             new_pos_j = 2*upper - new_pos_j
+        new_pos_j = max(new_pos_j, lower)
+        new_pos_j = min(new_pos_j, upper)
         new_pos = np.copy(pos[i_bee])
         new_pos[j_dim] = new_pos_j
         return new_pos
