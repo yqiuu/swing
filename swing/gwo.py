@@ -11,7 +11,13 @@ class GreyWolf(Workspace):
         func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False, restart_file=None,
         niter_max=100, initial_pos=None
     ):
-        restart_keys = ['_pos', '_cost', "_niter_max"]
+        restart_keys = [
+            "_pos", "_cost",
+            "_pos_alpha", "_cost_alpha",
+            "_pos_beta", "_cost_beta",
+            "_pos_delta", "_cost_delta",
+            "_niter_max"
+        ]
         super().__init__(
             func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool, vectorize=vectorize,
             restart_file=restart_file, restart_keys=restart_keys
@@ -32,6 +38,12 @@ class GreyWolf(Workspace):
         self._cost_beta = self._cost[inds[1]]
         self._pos_delta = np.copy(self._pos[inds[2]])
         self._cost_delta = self._cost[inds[2]]
+        return {
+            'init':{
+                'pos': np.copy(self._pos),
+                'cost': np.copy(self._cost)
+            }
+        }
 
     def _phase_main(self):
         factor_a = 2*(1. - self._i_iter/self._niter_max)
@@ -45,6 +57,13 @@ class GreyWolf(Workspace):
         self._pos = pos_new
         self._cost = self._evaluate_multi(self._pos)
         self._update_leader()
+
+        return {
+            'main':{
+                'pos': np.copy(self._pos),
+                'cost': np.copy(self._cost)
+            }
+        }
 
     def _update_leader(self):
         inds = np.argsort(self._cost)
