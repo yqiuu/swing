@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from swing import ArtificialBeeColony, ParticleSwarm
+from swing import ArtificialBeeColony, ParticleSwarm, GreyWolf
 
 
 def cost_func(x):
@@ -49,5 +49,5 @@ def test_consistency(tmpdir):
 
     # Run tests for all optimizer
     tmpfile = tmpdir.mkdir('tmp').join('checkpoint')
-    for target in [ArtificialBeeColony, ParticleSwarm]:
+    for target in [ArtificialBeeColony, ParticleSwarm, GreyWolf]:
         run(target, tmpfile)
