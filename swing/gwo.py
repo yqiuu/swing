@@ -25,7 +25,13 @@ class GreyWolf(Workspace):
         else:
             self._pos = self._initial_pos
         self._cost = self._evaluate_multi(self._pos)
-        self._update_leader()
+        inds = np.argsort(self._cost)
+        self._pos_alpha = np.copy(self._pos[inds[0]])
+        self._cost_alpha = self._cost[inds[0]]
+        self._pos_beta = np.copy(self._pos[inds[1]])
+        self._cost_beta = self._cost[inds[1]]
+        self._pos_delta = np.copy(self._pos[inds[2]])
+        self._cost_delta = self._cost[inds[2]]
 
     def _phase_main(self):
         factor_a = 2*(1. - self._i_iter/self._niter_max)
@@ -42,9 +48,23 @@ class GreyWolf(Workspace):
 
     def _update_leader(self):
         inds = np.argsort(self._cost)
-        self._pos_alpha = np.copy(self._pos[inds[0]])
-        self._pos_beta = np.copy(self._pos[inds[1]])
-        self._pos_delta = np.copy(self._pos[inds[2]])
+        cost_sorted = self._cost[inds]
+        pos_sorted = self._pos[inds]
+        for p_i, c_i in zip(pos_sorted, cost_sorted):
+            if c_i < self._cost_alpha:
+                self._pos_alpha = p_i
+                self._cost_alpha = c_i
+                break
+        for p_i, c_i in zip(pos_sorted, cost_sorted):
+            if c_i >= self._cost_alpha and c_i < self._cost_beta:
+                self._pos_beta = p_i
+                self._cost_beta = c_i
+                break
+        for p_i, c_i in zip(pos_sorted, cost_sorted):
+            if c_i >= self._cost_beta and c_i < self._cost_delta:
+                self._pos_delta = p_i
+                self._cost_delta = c_i
+                break
 
     def _follow_leader(self, pos_leader, factor_a):
         factor_A = factor_a*(2*self._rstate.rand(self._nswarm, self._ndim) - 1)
