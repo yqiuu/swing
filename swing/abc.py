@@ -35,16 +35,13 @@ class ArtificialBeeColony(Workspace):
     """
     def __init__(self,
         func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False, restart_file=None,
-        limit=0, gbest_c=1.5, initial_pos=None
+        limit=20, gbest_c=1.5, initial_pos=None
     ):
         super().__init__(
             func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool, vectorize=vectorize,
             restart_file=restart_file, restart_keys=['_pos', '_cost', '_trail']
         )
-        if limit == 0:
-            self._limit = int(.6*nswarm*self._ndim)
-        else:
-            self._limit = limit
+        self._limit = limit
         self._gbest_c = gbest_c
         if initial_pos is not None:
             initial_pos = initial_pos.copy()
