@@ -35,7 +35,7 @@ class ArtificialBeeColony(Workspace):
     """
     def __init__(self,
         func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False, restart_file=None,
-        limit=20, gbest_c=1.5, initial_pos=None
+        limit=50, gbest_c=1.5, initial_pos=None
     ):
         super().__init__(
             func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool, vectorize=vectorize,
@@ -78,7 +78,7 @@ class ArtificialBeeColony(Workspace):
 
 
     def _move(self, i_bee, new_pos, new_cost):
-        if new_cost < self._cost[i_bee]:
+        if new_cost < self._cost[i_bee] or self._trail[i_bee] == -1:
             self._pos[i_bee] = new_pos
             self._cost[i_bee] = new_cost
             self._trail[i_bee] = 0
@@ -118,7 +118,7 @@ class ArtificialBeeColony(Workspace):
         for i_bee in queue:
             if self._trail[i_bee] > self._limit:
                 new_pos[i_bee] = self._init_new_pos()
-                self._trail[i_bee] = 0
+                self._trail[i_bee] = -1
             else:
                 new_pos[i_bee] = self._search_new_pos(i_bee)
         new_pos = np.asarray(new_pos)
