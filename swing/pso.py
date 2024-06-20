@@ -40,7 +40,7 @@ class ParticleSwarm(Workspace):
     def __init__(self,
         func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False,
         restart_file=None, weight=0.729, acc_lbest=1.49, acc_gbest=1.49,
-        vel_max_frac=1., initial_pos=None, has_blob=False
+        vel_max_frac=1., initial_pos=None, blob=False
     ):
         restart_keys = [
             '_vel', '_pos', '_cost', '_pos_local_best', '_cost_local_best'
@@ -54,7 +54,7 @@ class ParticleSwarm(Workspace):
             vectorize=vectorize,
             restart_file=restart_file,
             restart_keys=restart_keys,
-            has_blob=has_blob
+            blob=blob
         )
         self._weight = weight
         self._acc_lbest = acc_lbest

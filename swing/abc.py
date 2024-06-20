@@ -36,7 +36,7 @@ class ArtificialBeeColony(Workspace):
     def __init__(self,
         func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False,
         restart_file=None, limit=50, gbest_c=1.5, initial_pos=None,
-        has_blob=False
+        blob=False
     ):
         super().__init__(
             func=func,
@@ -47,7 +47,7 @@ class ArtificialBeeColony(Workspace):
             vectorize=vectorize,
             restart_file=restart_file,
             restart_keys=['_pos', '_cost', '_trail'],
-            has_blob=has_blob
+            blob=blob
         )
         self._limit = limit
         self._gbest_c = gbest_c

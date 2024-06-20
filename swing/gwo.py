@@ -9,7 +9,7 @@ __all__ = ['GreyWolf']
 class GreyWolf(Workspace):
     def __init__(self,
         func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False,
-        restart_file=None, niter_max=100, initial_pos=None, has_blob=False
+        restart_file=None, niter_max=100, initial_pos=None, blob=False
     ):
         restart_keys = [
             "_pos", "_cost",
@@ -27,7 +27,7 @@ class GreyWolf(Workspace):
             vectorize=vectorize,
             restart_file=restart_file,
             restart_keys=restart_keys,
-            has_blob=has_blob
+            blob=blob
         )
         self._niter_max = niter_max
         self._initial_pos = initial_pos
