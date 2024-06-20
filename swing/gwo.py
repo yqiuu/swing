@@ -8,8 +8,8 @@ __all__ = ['GreyWolf']
 
 class GreyWolf(Workspace):
     def __init__(self,
-        func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False, restart_file=None,
-        niter_max=100, initial_pos=None
+        func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False,
+        restart_file=None, niter_max=100, initial_pos=None, has_blob=False
     ):
         restart_keys = [
             "_pos", "_cost",
@@ -19,8 +19,15 @@ class GreyWolf(Workspace):
             "_niter_max"
         ]
         super().__init__(
-            func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool, vectorize=vectorize,
-            restart_file=restart_file, restart_keys=restart_keys
+            func=func,
+            bounds=bounds,
+            nswarm=nswarm,
+            rstate=rstate,
+            pool=pool,
+            vectorize=vectorize,
+            restart_file=restart_file,
+            restart_keys=restart_keys,
+            has_blob=has_blob
         )
         self._niter_max = niter_max
         self._initial_pos = initial_pos
@@ -30,7 +37,7 @@ class GreyWolf(Workspace):
             self._pos = self._init_new_pos(self._nswarm)
         else:
             self._pos = self._initial_pos
-        self._cost = self._evaluate_multi(self._pos)
+        self._cost, blob = self._evaluate_multi(self._pos)
         inds = np.argsort(self._cost)
         self._pos_alpha = np.copy(self._pos[inds[0]])
         self._cost_alpha = self._cost[inds[0]]
@@ -41,7 +48,8 @@ class GreyWolf(Workspace):
         return {
             'init':{
                 'pos': np.copy(self._pos),
-                'cost': np.copy(self._cost)
+                'cost': np.copy(self._cost),
+                'blob': blob
             }
         }
 
@@ -55,13 +63,14 @@ class GreyWolf(Workspace):
         pos_new = self._reflect_pos(pos_new)
 
         self._pos = pos_new
-        self._cost = self._evaluate_multi(self._pos)
+        self._cost, blob = self._evaluate_multi(self._pos)
         self._update_leader()
 
         return {
             'main':{
                 'pos': np.copy(self._pos),
-                'cost': np.copy(self._cost)
+                'cost': np.copy(self._cost),
+                'blob': blob
             }
         }
 

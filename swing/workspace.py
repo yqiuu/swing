@@ -1,4 +1,5 @@
 import pickle
+from collections import namedtuple
 
 import numpy as np
 from scipy.stats.qmc import LatinHypercube
@@ -9,6 +10,8 @@ __all__ = ['Workspace']
 
 
 class Workspace:
+    _EvalOut = namedtuple("EvalOut", ["cost", "blob"])
+
     @property
     def pos_global_best(self):
         """Position of the global minimum"""
@@ -31,7 +34,8 @@ class Workspace:
 
 
     def __init__(self,
-        func, bounds, nswarm, rstate, pool, vectorize, restart_file, restart_keys
+        func, bounds, nswarm, rstate, pool,
+        vectorize, restart_file, restart_keys, has_blob
     ):
         self._func = func
         self._lbounds, self._ubounds = np.array(bounds).T
@@ -42,6 +46,7 @@ class Workspace:
         self._lh_sampler = LatinHypercube(self._ndim, seed=self._rstate)
         self._vectorize = vectorize
         self._pool = pool
+        self._has_blob = has_blob
         #
         self._pos_global_best = np.full(self._ndim, np.nan)
         self._cost_global_best = np.inf
@@ -120,19 +125,19 @@ class Workspace:
         self._memo['cost'].append(self._cost_global_best)
 
 
-    def _evaluate(self, pos):
-        self._ncall += 1
-        return self._func(pos)
-
-
     def _evaluate_multi(self, pos):
         self._ncall += len(pos)
         if self._vectorize:
             return self._func(pos)
         elif self._pool is None:
-            return np.asarray(list(map(self._func, pos)))
+            data = list(map(self._func, pos))
         else:
-            return np.asarray(list(self._pool.map(self._func, pos)))
+            data = list(self._pool.map(self._func, pos))
+        if self._has_blob:
+            cost = np.asarray([tup[0] for tup in data])
+            blob = [tup[1] for tup in data]
+            return self._EvalOut(cost, blob)
+        return self._EvalOut(np.asarray(data), None)
 
 
     def _update_global_best(self):

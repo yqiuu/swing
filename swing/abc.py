@@ -34,12 +34,20 @@ class ArtificialBeeColony(Workspace):
         Acceleration coefficient towards the glaobl minimum.
     """
     def __init__(self,
-        func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False, restart_file=None,
-        limit=50, gbest_c=1.5, initial_pos=None
+        func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False,
+        restart_file=None, limit=50, gbest_c=1.5, initial_pos=None,
+        has_blob=False
     ):
         super().__init__(
-            func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool, vectorize=vectorize,
-            restart_file=restart_file, restart_keys=['_pos', '_cost', '_trail']
+            func=func,
+            bounds=bounds,
+            nswarm=nswarm,
+            rstate=rstate,
+            pool=pool,
+            vectorize=vectorize,
+            restart_file=restart_file,
+            restart_keys=['_pos', '_cost', '_trail'],
+            has_blob=has_blob
         )
         self._limit = limit
         self._gbest_c = gbest_c
@@ -99,13 +107,14 @@ class ArtificialBeeColony(Workspace):
             self._pos = self._init_new_pos(self._nswarm)
         else:
             self._pos = self._initial_pos
-        self._cost = self._evaluate_multi(self._pos)
+        self._cost, blob = self._evaluate_multi(self._pos)
         self._trail = np.zeros(self._nswarm, dtype='i4')
         return {
             'init':{
                 'pos': np.copy(self._pos),
                 'cost': np.copy(self._cost),
-                'trail': np.copy(self._trail)
+                'trail': np.copy(self._trail),
+                "blob": blob
             }
         }
 
@@ -122,23 +131,25 @@ class ArtificialBeeColony(Workspace):
             else:
                 new_pos[i_bee] = self._search_new_pos(i_bee)
         new_pos = np.asarray(new_pos)
-        new_cost = self._evaluate_multi(new_pos)
+        new_cost, blob = self._evaluate_multi(new_pos)
         for _ in map(self._move, queue, new_pos, new_cost): pass
         self._update_global_best()
         info['employer'] = {
             'pos': np.copy(new_pos),
             'cost': np.copy(new_cost),
-            'trail': np.copy(self._trail)
+            'trail': np.copy(self._trail),
+            'blob': blob
         }
         # Onlooker bees phase
         queue = self._dance_area()
         new_pos = list(map(self._search_new_pos, queue))
         new_pos = np.asarray(new_pos)
-        new_cost = self._evaluate_multi(new_pos)
+        new_cost, blob = self._evaluate_multi(new_pos)
         for _ in map(self._move, queue, new_pos, new_cost): pass
         info['onlooker'] = {
             'pos': np.copy(new_pos),
             'cost': np.copy(new_cost),
-            'trail': np.copy(self._trail)
+            'trail': np.copy(self._trail),
+            'blob': blob
         }
         return info

@@ -38,15 +38,23 @@ class ParticleSwarm(Workspace):
         Maximum velocity fraction with respect to the search ranges.
     """
     def __init__(self,
-        func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False, restart_file=None,
-        weight=0.729, acc_lbest=1.49, acc_gbest=1.49, vel_max_frac=1., initial_pos=None
+        func, bounds, nswarm=16, rstate=None, pool=None, vectorize=False,
+        restart_file=None, weight=0.729, acc_lbest=1.49, acc_gbest=1.49,
+        vel_max_frac=1., initial_pos=None, has_blob=False
     ):
         restart_keys = [
             '_vel', '_pos', '_cost', '_pos_local_best', '_cost_local_best'
         ]
         super().__init__(
-            func=func, bounds=bounds, nswarm=nswarm, rstate=rstate, pool=pool, vectorize=vectorize,
-            restart_file=restart_file, restart_keys=restart_keys
+            func=func,
+            bounds=bounds,
+            nswarm=nswarm,
+            rstate=rstate,
+            pool=pool,
+            vectorize=vectorize,
+            restart_file=restart_file,
+            restart_keys=restart_keys,
+            has_blob=has_blob
         )
         self._weight = weight
         self._acc_lbest = acc_lbest
@@ -117,14 +125,16 @@ class ParticleSwarm(Workspace):
             self._pos = self._init_new_pos(self._nswarm)
         else:
             self._pos = self._initial_pos
-        self._cost = self._evaluate_multi(self._pos)
+        eval_tup = self._evaluate_multi(self._pos)
+        self._cost = eval_tup.cost
         self._pos_local_best = np.copy(self._pos)
         self._cost_local_best = np.copy(self._cost)
         return {
             'init':{
                 'vel': np.copy(self._vel),
                 'pos': np.copy(self._pos),
-                'cost': np.copy(self._cost)
+                'cost': np.copy(self._cost),
+                'blob': eval_tup.blob,
             }
         }
 
@@ -133,7 +143,8 @@ class ParticleSwarm(Workspace):
         next_vel = np.asarray(list(map(self._next_vel, range(self._nswarm))))
         next_pos = self._pos + next_vel
         next_vel, next_pos = self._check_bounds(next_vel, next_pos)
-        next_cost = self._evaluate_multi(next_pos)
+        eval_tup = self._evaluate_multi(next_pos)
+        next_cost = eval_tup.cost
         self._vel = next_vel
         self._pos = next_pos
         self._cost = next_cost
@@ -142,6 +153,7 @@ class ParticleSwarm(Workspace):
             'main':{
                 'vel': np.copy(self._vel),
                 'pos': np.copy(self._pos),
-                'cost': np.copy(self._cost)
+                'cost': np.copy(self._cost),
+                'blob': eval_tup.blob
             }
         }
